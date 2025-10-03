@@ -101,3 +101,23 @@ int checkString(char str[], size_t length){
     }
     return state;
 }
+
+void findCandPascalNums(char *str){
+    int i = 0, *addC, counterNums = 0, state = 1, typeOfChar, indexStartNum, isC;
+    char *cStrings, *pascalStrings; //надо память выделять под них и потом записывать туда соотв строки
+    while (str[i] != '\0'){
+        typeOfChar = getCharType(str + i + *addC, addC);
+        state = values[state][typeOfChar];
+        if (isFinalState[state]){
+            isC = *addC;
+            counterNums++;
+        }
+        if ((state == 0) && (typeOfChar == Unknown)){
+            state = 1;
+            i++;
+            continue;
+        }
+        if (typeOfChar = StartN) indexStartNum = i;
+        i++;
+    }
+}
