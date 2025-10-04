@@ -18,12 +18,14 @@ int checkString(char str[], size_t length);
 void * checkRealloc(void *pointer, size_t newLength);
 void findCandPascalNums(char *str);
 void grow(char **str, int *capacity);
+void printSubstrings(char *pascalStrings, int length_Pascal, char *cStrings, int length_C);
 
 int main(int argc, char const *argv[])
 {
     while (1){
         size_t len = 0;
         char *string;
+        printf("Input your string: ");
         len = getInput(&string);
         if (isFinalState[checkString(string, len)]){
             if (*string == '$') printf("It is a Pascal hex num \n");
@@ -48,7 +50,7 @@ int getInput(char **string)
     str = calloc(capacity, sizeof(char));
     while ((symbol = getchar()) != '\n')      
     { 
-        if (length > capacity - 2)
+        if (length == capacity) //if (length > capacity - 2)
         {
             capacity = capacity << 1;
             str = checkRealloc(str, capacity);
@@ -103,6 +105,7 @@ int checkString(char str[], size_t length){
     for (size_t i = 0; i < length; i++){
         state = values[state][getCharType(str + i + *addC, addC)];
     }
+    free(addC);
     return state;
 }
 
@@ -119,7 +122,6 @@ void findCandPascalNums(char *str){
     int *C_capacity, *Pascal_capacity, length_C, length_Pascal;
     length_C = 0;
     length_Pascal = 0;
-
     C_capacity = malloc(sizeof(int));
     Pascal_capacity = malloc(sizeof(int));
     *C_capacity = 16;
@@ -129,7 +131,7 @@ void findCandPascalNums(char *str){
     cStrings = malloc(*C_capacity);
     pascalStrings = malloc(*Pascal_capacity);
     while (str[i] != '\0'){
-        typeOfChar = getCharType(str + i + *addC, addC);
+        typeOfChar = getCharType(str + i/* + *addC*/, addC);
         state = values[state][typeOfChar];
         if (isFinalState[state]){
             if (isCstring){
@@ -148,14 +150,67 @@ void findCandPascalNums(char *str){
             }
         }
         else if ((state == 0) && (typeOfChar != StartN)) state = 1;
-        else if ((typeOfChar = StartN) && (state == 2)){
+        else if ((typeOfChar == StartN) && (state == 2)){
             indexStartNum = i;
             isCstring = *addC;
         }
         else if ((state == 0) && (typeOfChar == StartN)){
+            //isCstring = *addC;
+            if (*addC){
+                if (isCstring) {
+                    for (int index = indexStartNum; index <= i; index++){
+                        if (length_C == *C_capacity) grow(&cStrings, C_capacity);
+                        cStrings[length_C] = str[index]; 
+                        length_C++;
+                    } 
+                }
+                else {
+                    for (int index = indexStartNum; index <= i; index++){
+                        if (length_Pascal == *Pascal_capacity) grow(&pascalStrings, Pascal_capacity);
+                        pascalStrings[length_Pascal] = str[index]; 
+                        length_Pascal++;
+                    }     
+                }
+            }
             state = 1;
             continue;
         }
         i = i + 1 + *addC;
     }
+    printSubstrings(pascalStrings, length_Pascal, cStrings, length_C);
+
+    //избавляемся от утечек памяти
+    free(addC);
+    free(C_capacity);
+    free(Pascal_capacity);
+    free(cStrings);
+    free(pascalStrings);
+}
+
+void printSubstrings(char *pascalStrings, int length_Pascal, char *cStrings, int length_C){
+    //Вывод паскаль чисел
+    if (length_Pascal != 0){
+        printf("Founded Pascal substrings:\n");
+        for (int i = 0; i < length_Pascal; i++){
+            if ((pascalStrings[i] == '$') && (i != 0)) printf("\n%c", pascalStrings[i]);
+            else printf("%c", pascalStrings[i]);
+        }
+        printf("\n\n");
+    }
+    else printf("There arent any Pascal substrings\n\n");
+
+    //Вывод си чисел
+    if (length_C != 0){
+        printf("Founded C substrings:\n");
+        int *addC;
+        addC = malloc(sizeof(int));
+        *addC = 0;
+        for (int i = 0; i < length_C; i++){
+            if ((getCharType(cStrings + i, addC) == StartN) && (i != 0)) printf("\n%c", cStrings[i]);
+            else printf("%c", cStrings[i]);
+        }
+        printf("\n\n");
+        free(addC);
+    }
+    else printf("There arent any C substrings\n\n");
 }
