@@ -16,6 +16,9 @@ int getCharType(char *symbol, int *addC);
 int getInput(char **str);
 int checkString(char str[], size_t length);
 void * checkRealloc(void *pointer, size_t newLength);
+void findCandPascalNums(char *str);
+void grow(char **str, int *capacity);
+
 int main(int argc, char const *argv[])
 {
     while (1){
@@ -29,6 +32,7 @@ int main(int argc, char const *argv[])
         else {
             printf("It is not a hex num in C or Pascal \n");
         }
+        findCandPascalNums(string);
         free(string);
     }
     return 0;
@@ -102,22 +106,56 @@ int checkString(char str[], size_t length){
     return state;
 }
 
+void grow(char **str, int *capacity){
+    *capacity = (*capacity) * 2;
+    *str = (char *) checkRealloc(*str, *capacity);
+}
+
 void findCandPascalNums(char *str){
-    int i = 0, *addC, counterNums = 0, state = 1, typeOfChar, indexStartNum, isC;
+    int i = 0, *addC, state = 1, typeOfChar, indexStartNum, isCstring;
+    addC = malloc(sizeof(int));
+    *addC = 0;
+
+    int *C_capacity, *Pascal_capacity, length_C, length_Pascal;
+    length_C = 0;
+    length_Pascal = 0;
+
+    C_capacity = malloc(sizeof(int));
+    Pascal_capacity = malloc(sizeof(int));
+    *C_capacity = 16;
+    *Pascal_capacity = 16;
+
     char *cStrings, *pascalStrings; //надо память выделять под них и потом записывать туда соотв строки
+    cStrings = malloc(*C_capacity);
+    pascalStrings = malloc(*Pascal_capacity);
     while (str[i] != '\0'){
         typeOfChar = getCharType(str + i + *addC, addC);
         state = values[state][typeOfChar];
         if (isFinalState[state]){
-            isC = *addC;
-            counterNums++;
+            if (isCstring){
+                for (int index = indexStartNum; index <= i; index++){
+                    if (length_C == *C_capacity) grow(&cStrings, C_capacity);
+                    cStrings[length_C] = str[index]; 
+                    length_C++;
+                }    
+            }
+            else {
+                for (int index = indexStartNum; index <= i; index++){
+                    if (length_Pascal == *Pascal_capacity) grow(&pascalStrings, Pascal_capacity);
+                    pascalStrings[length_Pascal] = str[index]; 
+                    length_Pascal++;
+                } 
+            }
         }
-        if ((state == 0) && (typeOfChar == Unknown)){
+        else if ((state == 0) && (typeOfChar != StartN)) state = 1;
+        else if ((typeOfChar = StartN) && (state == 2)){
+            indexStartNum = i;
+            isCstring = *addC;
+        }
+        else if ((state == 0) && (typeOfChar == StartN)){
             state = 1;
-            i++;
             continue;
         }
-        if (typeOfChar = StartN) indexStartNum = i;
-        i++;
+        i = i + 1 + *addC;
     }
 }
