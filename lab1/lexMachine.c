@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "header.h"
 
-enum TCharType{
-    Unknown,
-    StartN,
-    Digit,
-    Letters,
-    TCharTypeCount //количество состояний
+enum TCharType1{
+    Unknown_,
+    StartPascal_,
+    Zero_,
+    ContinueC_,
+    Digit_,
+    Letters_,
+    TCharTypeCount_ //количество состояний
 };
 
 const int isFinalState[] = {0, 0, 0, 1};
@@ -214,3 +217,54 @@ void printSubstrings(char *pascalStrings, int length_Pascal, char *cStrings, int
     }
     else printf("There arent any C substrings\n\n");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// int read_line_from_file(const char* filename, char* buf, size_t buf_size) {
+//     FILE* f = fopen(filename, "r");
+//     if (!f) {
+//         perror("Не удалось открыть файл");
+//         return 0;
+//     }
+
+//     if (!fgets(buf, buf_size, f)) {
+//         fclose(f);
+//         return 0; // ошибка или пустой файл
+//     }
+
+//     // Убираем перевод строки, если есть
+//     size_t len = strlen(buf);
+//     if (len > 0 && buf[len - 1] == '\n') {
+//         buf[len - 1] = '\0';
+//     }
+
+//     fclose(f);
+//     return 1;
+// }
+// if (!read_line_from_file("D:\\ktlabs\\lab1\\output\\input.txt", s, sizeof(s))) {
+//     printf("Ошибка чтения строки из файла\n");
+//     return 1;
+// }
